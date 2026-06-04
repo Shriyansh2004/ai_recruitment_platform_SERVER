@@ -5,6 +5,7 @@ import com.server.user_service.dto.request.RegisterRequest;
 import com.server.user_service.dto.response.AuthResponse;
 import com.server.user_service.entity.User;
 import com.server.user_service.exception.UserAlreadyExistsException;
+import com.server.user_service.exception.UserNotFoundException;
 import com.server.user_service.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.*;
@@ -50,7 +51,8 @@ public class AuthService {
         );
 
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow();
+                .orElseThrow(() -> new UserNotFoundException(
+                        "User not found: " + request.getEmail()));
 
         String token = jwtService.generateToken(user);
         return AuthResponse.builder()
